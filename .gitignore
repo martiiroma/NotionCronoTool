@@ -9,6 +9,10 @@ __pycache__/
 # Local data (offline queue of sessions, from phase 2)
 data/
 
+# Background videos: too heavy for the repo, each user adds their own
+static/media/*
+!static/media/.gitkeep
+
 # Editor and OS files
 .vscode/
 .idea/

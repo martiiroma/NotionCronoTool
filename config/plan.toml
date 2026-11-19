@@ -1,0 +1,31 @@
+# NotionCronoTool settings. You can edit this file at any time:
+# the changes apply when you reload the page (no need to restart the server).
+
+[app]
+# Big title on the main page.
+title = "Pas a pas, cim a cim"
+
+# Maximum ACTIVE time per session, in minutes (pauses do not count).
+# For testing, you can lower it temporarily, e.g. 1 (one minute) or 0.5 (30 seconds).
+session_limit_minutes = 180
+
+# Message shown when a session reaches the limit.
+limit_message = "Has fet cim: 3 hores! 🏔️ Ara toca baixar al refugi. Descansa i continua més tard, o demà."
+
+# Background video: file name inside static/media/ (e.g. "pirineu.mp4").
+# Leave it empty to use a plain gradient background.
+background_video = ""
+
+# The 10 blocks. Names must match the "Bloc" options in Notion exactly.
+blocks = [
+  "PM",
+  "Python",
+  "SQL i bases de dades",
+  "Excel/Power BI online",
+  "Exercici de comandes",
+  "Portafoli",
+  "Cerca de feina",
+  "Tancament setmanal",
+  "Formació presencial",
+  "IT Academy",
+]

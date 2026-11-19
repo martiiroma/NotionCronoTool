@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NotionCronoTool</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="layout">
+    <!-- Left column: title, status, session bar and controls -->
+    <section class="hero">
+      <h1 id="title" class="title">NotionCronoTool</h1>
+      <p id="status-line" class="status-line">Tria un bloc per començar</p>
+
+      <button id="work-toggle" class="work-toggle" type="button"
+              role="switch" aria-checked="false" disabled>
+        <span class="work-toggle-knob" aria-hidden="true"></span>
+        <span id="work-toggle-label">Mode treball</span>
+      </button>
+
+      <div class="session-bar">
+        <select id="block-select" aria-label="Bloc">
+          <option value="">Tria un bloc…</option>
+        </select>
+        <input id="description-input" type="text" maxlength="200"
+               placeholder="Descriu la sessió (opcional)" aria-label="Descripció">
+      </div>
+
+      <div class="controls">
+        <button id="primary-button" class="control-button" type="button" disabled>▶ Inicia</button>
+        <button id="stop-button" class="control-button" type="button" disabled>■ Atura</button>
+      </div>
+    </section>
+
+    <!-- Right column: the stopwatch card -->
+    <aside id="timer-card" class="timer-card">
+      <div id="clock" class="clock" aria-hidden="true"></div>
+      <p id="elapsed" class="elapsed">00:00:00</p>
+      <h2 id="card-block" class="card-block">—</h2>
+      <p id="card-state" class="card-state">Aturat</p>
+
+      <p id="limit-message" class="limit-message" hidden></p>
+      <p id="summary" class="summary" hidden></p>
+
+      <button id="note-button" class="note-button" type="button">Afegeix una nota</button>
+      <textarea id="note-input" class="note-input" rows="3" maxlength="2000"
+                placeholder="Com ha anat la sessió?" hidden></textarea>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span id="notion-status">Comprovant la connexió amb Notion…</span>
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

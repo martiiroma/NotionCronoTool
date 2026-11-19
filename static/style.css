@@ -1,0 +1,191 @@
+/* Phase 1, layer A: simple functional styles.
+   The glass look, analog clock and video background come in layer B. */
+
+:root {
+  --bg: #e9eef3;
+  --card: #ffffff;
+  --text: #1d2733;
+  --muted: #5b6b7c;
+  --accent: #d9822b;
+  --paused: #4a78b5;
+  --border: #cfd8e2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: center;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.title {
+  font-size: 3rem;
+  margin: 0 0 8px;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 1.2rem;
+  margin: 0 0 20px;
+}
+
+/* Toggle (work mode switch) */
+.work-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  font: inherit;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.work-toggle-knob {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.work-toggle[aria-checked="true"] .work-toggle-knob {
+  background: var(--accent);
+}
+
+.work-toggle:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Session bar: block + description */
+.session-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.session-bar select,
+.session-bar input,
+.note-input {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.session-bar input {
+  flex: 1;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+.control-button,
+.note-button {
+  font: inherit;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  cursor: pointer;
+}
+
+/* Stopwatch card */
+.timer-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+}
+
+.timer-card[data-status="running"] {
+  border-color: var(--accent);
+}
+
+/* Paused: the card must make it obvious */
+.timer-card[data-status="paused"] {
+  border-color: var(--paused);
+  border-style: dashed;
+}
+
+.timer-card[data-status="paused"] .card-state {
+  color: var(--paused);
+  font-weight: 700;
+}
+
+.elapsed {
+  font-size: 2.6rem;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0;
+}
+
+.card-block {
+  margin: 0;
+}
+
+.card-state {
+  color: var(--muted);
+  margin: 4px 0 16px;
+}
+
+.limit-message {
+  background: #fff4e5;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+.summary {
+  color: var(--muted);
+}
+
+.note-input {
+  width: 100%;
+  margin-top: 12px;
+  resize: vertical;
+}
+
+.footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+#notion-status[data-connected="false"] {
+  color: #b3261e;
+}
