@@ -4,55 +4,112 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NotionCronoTool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body data-status="idle">
+  <!-- Background: looping video (if configured) over a mountain gradient -->
+  <video id="bg-video" class="bg-video" muted loop playsinline hidden></video>
+  <div class="scrim" aria-hidden="true"></div>
+
   <main class="layout">
-    <!-- Left column: title, status, session bar and controls -->
+    <!-- Left column: title, status, toggle, session bar and controls -->
     <section class="hero">
       <h1 id="title" class="title">NotionCronoTool</h1>
       <p id="status-line" class="status-line">Tria un bloc per començar</p>
 
-      <button id="work-toggle" class="work-toggle" type="button"
+      <button id="work-toggle" class="work-toggle glass" type="button"
               role="switch" aria-checked="false" disabled>
-        <span class="work-toggle-knob" aria-hidden="true"></span>
-        <span id="work-toggle-label">Mode treball</span>
+        <span class="work-toggle-knob glass" aria-hidden="true">
+          <!-- Sun: work mode on -->
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+          <!-- Moon: work mode off -->
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        </span>
+        <span id="work-toggle-label" class="work-toggle-label">Inactiu</span>
       </button>
 
-      <div class="session-bar">
-        <select id="block-select" aria-label="Bloc">
-          <option value="">Tria un bloc…</option>
-        </select>
-        <input id="description-input" type="text" maxlength="200"
-               placeholder="Descriu la sessió (opcional)" aria-label="Descripció">
+      <div class="session-bar glass">
+        <!-- Glass dropdown, built by glass-select.js -->
+        <div id="block-select" class="glass-select"></div>
+        <span class="session-bar-divider" aria-hidden="true"></span>
+        <input id="initial-note-input" type="text" maxlength="500"
+               placeholder="Nota inicial (opcional)" aria-label="Nota inicial">
       </div>
 
       <div class="controls">
-        <button id="primary-button" class="control-button" type="button" disabled>▶ Inicia</button>
-        <button id="stop-button" class="control-button" type="button" disabled>■ Atura</button>
+        <button id="primary-button" class="control-button glass" type="button" disabled>
+          <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+          <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
+          <span id="primary-label">Inicia</span>
+        </button>
+        <button id="stop-button" class="control-button glass" type="button" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          <span>Atura</span>
+        </button>
       </div>
     </section>
 
     <!-- Right column: the stopwatch card -->
-    <aside id="timer-card" class="timer-card">
-      <div id="clock" class="clock" aria-hidden="true"></div>
-      <p id="elapsed" class="elapsed">00:00:00</p>
+    <aside id="timer-card" class="timer-card glass" data-status="idle">
+      <svg id="clock" class="clock" viewBox="0 0 200 216" role="img" aria-label="Cronòmetre">
+        <!-- Pushers: crown (start/pause) and side button (stop) -->
+        <g id="pusher-start" class="pusher">
+          <rect x="94" y="20" width="12" height="13" rx="2"/>
+          <rect x="85" y="7" width="30" height="15" rx="6"/>
+        </g>
+        <g transform="rotate(42 100 116)">
+          <g id="pusher-stop" class="pusher">
+            <rect x="96" y="22" width="8" height="11" rx="2"/>
+            <rect x="90" y="12" width="20" height="12" rx="5"/>
+          </g>
+        </g>
+
+        <!-- Case and dial. The outer ring fills minute by minute. -->
+        <circle class="clock-case" cx="100" cy="116" r="84"/>
+        <circle class="clock-track" cx="100" cy="116" r="76"/>
+        <circle id="clock-progress" class="clock-progress" cx="100" cy="116" r="76"
+                pathLength="100" stroke-dashoffset="100" transform="rotate(-90 100 116)"/>
+        <g id="clock-ticks" class="clock-ticks"></g>
+        <text class="clock-number" x="100" y="68">60</text>
+        <text class="clock-number" x="150" y="120">15</text>
+        <text class="clock-number" x="100" y="177">30</text>
+        <text class="clock-number" x="50" y="120">45</text>
+
+        <!-- Digital time, small, as on some real stopwatches -->
+        <text id="elapsed" class="clock-elapsed" x="100" y="96">00:00:00</text>
+
+        <!-- Hours sub-dial: one full turn = the session limit (3 h) -->
+        <circle class="subdial" cx="100" cy="144" r="16"/>
+        <g id="subdial-ticks" class="clock-ticks"></g>
+        <line id="hour-hand" class="hour-hand" x1="100" y1="144" x2="100" y2="131"/>
+
+        <!-- Seconds hand -->
+        <line id="second-hand" class="second-hand" x1="100" y1="130" x2="100" y2="46"/>
+        <circle class="hand-cap" cx="100" cy="116" r="4.5"/>
+        <circle class="hand-cap-inner" cx="100" cy="116" r="1.6"/>
+      </svg>
+
       <h2 id="card-block" class="card-block">—</h2>
       <p id="card-state" class="card-state">Aturat</p>
+      <p id="card-initial-note" class="card-initial-note"></p>
 
       <p id="limit-message" class="limit-message" hidden></p>
       <p id="summary" class="summary" hidden></p>
 
-      <button id="note-button" class="note-button" type="button">Afegeix una nota</button>
-      <textarea id="note-input" class="note-input" rows="3" maxlength="2000"
-                placeholder="Com ha anat la sessió?" hidden></textarea>
+      <button id="note-button" class="note-button" type="button">Afegeix a la nota</button>
+      <textarea id="extra-note-input" class="note-input" rows="3" maxlength="2000"
+                placeholder="Afegeix-hi el que vulguis…" hidden></textarea>
     </aside>
   </main>
 
   <footer class="footer">
-    <span id="notion-status">Comprovant la connexió amb Notion…</span>
+    <span id="notion-status" class="notion-status glass">Comprovant la connexió amb Notion…</span>
   </footer>
 
+  <script src="{{ url_for('static', filename='glass-select.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

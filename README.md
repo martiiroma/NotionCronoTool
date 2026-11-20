@@ -21,3 +21,9 @@ python app.py
 ```
 
 Obre <http://localhost:5000> al navegador.
+
+## Personalitzar
+
+Tots els ajustos són a `config/plan.toml` (títol, blocs, límit de temps, missatge). Els canvis s'apliquen en recarregar la pàgina.
+
+**Vídeo de fons (opcional):** posa un vídeo `.mp4` a `static/media/` (per exemple, un de llicència lliure de [Pexels](https://www.pexels.com/)) i escriu-ne el nom a `background_video`. Millor en 1080p: el 4K pesa molt i fa treballar més l'ordinador. Els vídeos no es pugen al repositori. Sense vídeo, es mostra un degradat.

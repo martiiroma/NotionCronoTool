@@ -1,6 +1,6 @@
 # SPEC — NotionCronoTool v1
 
-*Versió 1.0 · 17/11/2026 · Responsable: autor del repositori*
+*Versió 1.1 · 20/11/2026 · Responsable: autor del repositori · Canvis respecte a la 1.0 a la secció 9*
 
 ## 1. Problema i objectiu
 
@@ -39,10 +39,10 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 ### HU1 — Iniciar una sessió
 *Com a estudiant, vull triar un bloc i prémer «Inicia» per registrar el temps sense haver-hi de pensar.*
 - [ ] Hi ha un selector amb els 10 blocs, amb els mateixos noms que a Notion: PM, Python, SQL i bases de dades, Excel/Power BI online, Exercici de comandes, Portafoli, Cerca de feina, Tancament setmanal, Formació presencial, IT Academy.
-- [ ] Hi ha un camp opcional per descriure la sessió. Si queda buit, el títol de la fila és el nom del bloc.
+- [ ] Al costat del selector hi ha un camp opcional de **nota inicial** (per exemple, «Avui toca acabar el curs»), que es veu durant tota la sessió.
 - [ ] «Inicia» està desactivat fins que hi ha un bloc triat.
 - [ ] En iniciar, el cronòmetre mostra el temps actiu en format hh:mm:ss.
-- [ ] En iniciar, es crea una fila a ⏱ Sessions amb `Sessió`, `Bloc`, inici de `Franja` i `Origen` = Eina.
+- [ ] Durant la sessió, «Afegeix a la nota» permet escriure més text, que s'uneix a la nota inicial.
 - [ ] Només hi pot haver una sessió activa alhora.
 
 ### HU2 — Pausar i reprendre
@@ -52,11 +52,14 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 - [ ] Hi pot haver diverses pauses dins la mateixa sessió.
 - [ ] En aturar, el total de minuts en pausa es desa a `Pausa (min)`.
 
-### HU3 — Aturar i valorar la sessió
-*Com a estudiant, vull aturar la sessió i, si vull, anotar com m'ha anat amb un sol clic.*
-- [ ] En aturar, s'escriu el final de `Franja` i `Pausa (min)` a la fila de Notion.
-- [ ] Després d'aturar, apareixen tres botons (Plaer, Neutre, Peatge), un camp de nota opcional i l'opció «Ometre».
-- [ ] Un sol clic en una sensació la desa. La nota és opcional.
+### HU3 — Aturar, revisar i enviar la sessió
+*Com a estudiant, vull aturar la sessió, revisar-ne el resum i enviar-la a Notion quan estigui a punt.*
+- [ ] En aturar, s'obre un modal amb el resum: bloc, temps actiu en hores i minuts (per exemple, «1 h 25 min») i nota final.
+- [ ] La nota final uneix la nota inicial i el text afegit durant la sessió. Si només n'hi ha un, és aquest.
+- [ ] El modal té un selector de **sensació** opcional (Peatge, Neutre, Plaer), amb el mateix component de vidre que el selector de blocs.
+- [ ] «Envia» crea la fila a ⏱ Sessions amb `Sessió` = «Bloc · dd/mm», `Bloc`, `Franja` (inici i final), `Pausa (min)`, `Nota`, `Sensació` i `Origen` = Eina.
+- [ ] «Cancel·la» torna a la pantalla principal: la sessió queda pendent, la nota es pot retocar i «Revisa i envia» torna a obrir el modal. No es pot iniciar una sessió nova fins que s'envia o es descarta.
+- [ ] «Descarta» (amb confirmació) elimina la sessió pendent sense enviar res.
 - [ ] Les `Hores` que calcula Notion coincideixen amb el temps actiu del cronòmetre (marge d'1 minut).
 
 ### HU4 — Límit de 3 hores
@@ -69,7 +72,8 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 ### HU5 — No perdre cap sessió
 *Com a estudiant, no vull perdre una sessió per haver tancat la pestanya o perquè Notion falli.*
 - [ ] Si tanco o recarrego la pestanya amb una sessió activa o en pausa, en tornar-la a obrir la sessió continua amb el temps correcte.
-- [ ] Si Notion no respon en iniciar o aturar, la sessió es guarda en un fitxer local i es torna a enviar automàticament quan Notion respon.
+- [ ] Si tanco o recarrego la pestanya amb una sessió pendent d'enviar, en tornar-la a obrir la sessió hi continua.
+- [ ] Si Notion no respon en enviar, la sessió es guarda en un fitxer local i es torna a enviar automàticament quan Notion respon.
 - [ ] Els errors es mostren en català i amb llenguatge clar (sense codis tècnics).
 
 ### HU6 — Vincular una tasca
@@ -97,14 +101,14 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 
 | Propietat | Tipus | Qui l'omple |
 |---|---|---|
-| Sessió | Títol | Eina (descripció o nom del bloc) |
+| Sessió | Títol | Eina («Bloc · dd/mm», per exemple «Python · 20/11») |
 | Bloc | Select (10 opcions) | Eina |
 | Franja | Data amb inici i final, amb hora | Eina |
 | Pausa (min) | Número | Eina |
 | Hores | Fórmula: (franja − pausa) / 60 | Notion, només lectura |
 | Tasca | Relació amb ✅ Tasques | Eina: hi escriu la tasca que l'usuari tria al selector. Triar-ne una és opcional per a l'usuari; si no en tria cap, queda buida |
 | Sensació | Select: Plaer, Neutre, Peatge | Eina, opcional |
-| Nota | Text | Eina, opcional |
+| Nota | Text | Eina, opcional (nota inicial + text afegit durant la sessió) |
 | Origen | Select: Manual, Eina | Eina (sempre «Eina») |
 
 **✅ Tasques** (només lectura): `Nom` (títol), `Estat` (status).
@@ -139,7 +143,7 @@ Conté el missatge del límit de 3 h, els grups (PM, Dades), els terres i les ho
 |---|---|---|---|
 | 0. Preparació | Entorn virtual, git, `.gitignore`, `.env.example`, integració de Notion (guiada pas a pas), prova de connexió que llegeix el nom de ⏱ Sessions | — | El servidor arrenca i mostra «Connectat a ⏱ Sessions» |
 | 1. Cronòmetre local | Selector de bloc, iniciar, pausar, reprendre, aturar, límit de 3 h; sense Notion encara | HU1 (part local), HU2, HU4 | Una sessió curta amb una pausa; límit provat amb un temps reduït de prova |
-| 2. Desar a Notion | Crear i tancar la fila, sensació i nota, recuperació en recarregar, cua local si Notion falla | HU1, HU3, HU5 | La fila apareix a Notion amb les Hores correctes; recarregar a mitja sessió no la perd |
+| 2. Desar a Notion | Modal de final de sessió (resum, sensació, Envia / Cancel·la / Descarta), crear la fila en enviar, recuperació en recarregar, cua local si Notion falla | HU1, HU3, HU5 | La fila apareix a Notion amb les Hores correctes; recarregar a mitja sessió no la perd |
 | 3. Tasques | Selector de tasques amb cerca | HU6 | La sessió queda vinculada a la tasca triada |
 | 4. Previst davant de real | Lectura de la setmana i de `plan.toml`, taula i totals | HU7 | Els totals coincideixen amb la vista «Per bloc» de Notion |
 | 5. Tancament | `start.bat`, `README.md` per al portafoli, captura de pantalla | HU8 | Obrir l'eina amb doble clic des de zero |
@@ -152,3 +156,18 @@ Conté el missatge del límit de 3 h, els grups (PM, Dades), els terres i les ho
 4. La notificació del navegador demana permís la primera vegada; si dic que no, només surt el missatge a la pàgina.
 5. El missatge del límit de 3 h és provisional fins que en definim el to.
 6. Per provar el límit de 3 h a la fase 1, es pot reduir temporalment a la configuració (per exemple, a 1 minut).
+
+## 9. Registre de canvis
+
+### v1.1 — 20/11/2026 (revisió de la UI de la fase 1)
+
+| # | Canvi | Abans (v1.0) | Motiu |
+|---|---|---|---|
+| 1 | El camp del costat del bloc és la **nota inicial** | Era la descripció i feia de títol de la fila | En provar la UI, la descripció i la nota es confonien. Una sola nota que creix durant la sessió és més natural |
+| 2 | Títol de la fila: **«Bloc · dd/mm»** | Descripció o nom del bloc | Com que la descripció passa a ser nota, cal un títol fix; amb la data, les files es distingeixen d'un cop d'ull |
+| 3 | La fila es crea **en prémer «Envia»** al modal | Es creava en prémer «Inicia» i es completava en aturar | El nou flux de revisió (Envia / Cancel·la) no deixa files a mig fer a Notion. La sessió es guarda al navegador fins que s'envia (HU5) |
+| 4 | **Modal de final de sessió** amb resum, Envia, Cancel·la i Descarta | Tres botons de sensació, nota i «Ometre» | Permet revisar abans d'enviar i corregir la nota |
+| 5 | Sensació amb un **selector de vidre** dins el modal | Tres botons, «un sol clic» | Coherència visual amb el selector de blocs. Passa de 1 a 2 clics; acceptat |
+| 6 | Selectors de vidre fets a mida | Selector natiu del navegador | El natiu no es pot fer de vidre; el component es reaprofita per a sensació (fase 2) i tasques amb cerca (fase 3) |
+
+**Impacte en el pressupost:** el selector a mida i el modal allarguen el projecte uns 45–60 min respecte a la previsió inicial. Acceptat el 20/11/2026.

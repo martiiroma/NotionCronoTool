@@ -3,7 +3,7 @@
 
 [app]
 # Big title on the main page.
-title = "Pas a pas, cim a cim"
+title = "Pas a pas"
 
 # Maximum ACTIVE time per session, in minutes (pauses do not count).
 # For testing, you can lower it temporarily, e.g. 1 (one minute) or 0.5 (30 seconds).
@@ -14,7 +14,7 @@ limit_message = "Has fet cim: 3 hores! 🏔️ Ara toca baixar al refugi. Descan
 
 # Background video: file name inside static/media/ (e.g. "pirineu.mp4").
 # Leave it empty to use a plain gradient background.
-background_video = ""
+background_video = "cronotool-bg_video.mp4"
 
 # The 10 blocks. Names must match the "Bloc" options in Notion exactly.
 blocks = [

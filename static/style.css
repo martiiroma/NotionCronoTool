@@ -1,14 +1,23 @@
-/* Phase 1, layer A: simple functional styles.
-   The glass look, analog clock and video background come in layer B. */
+/* NotionCronoTool - light glass look over a mountain video. */
 
 :root {
-  --bg: #e9eef3;
-  --card: #ffffff;
-  --text: #1d2733;
-  --muted: #5b6b7c;
-  --accent: #d9822b;
-  --paused: #4a78b5;
-  --border: #cfd8e2;
+  --glass-bg: rgba(255, 255, 255, 0.16);
+  --glass-bg-strong: rgba(255, 255, 255, 0.26);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(20px) saturate(150%);
+  --shadow: 0 10px 40px rgba(10, 20, 30, 0.18);
+
+  --text: #fffaf2;
+  --text-soft: rgba(255, 250, 242, 0.85);
+  --text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 0 18px rgba(0, 0, 0, 0.18);
+  --ink: #1d2733; /* dark text, for the note text area */
+
+  --warm: #ffb547;  /* work mode */
+  --cool: #8ec5ff;  /* paused */
+  --alert: #ffd6a0;
+
+  --font: "Manrope", system-ui, "Segoe UI", sans-serif;
 }
 
 * {
@@ -18,174 +27,567 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: system-ui, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
   display: flex;
   flex-direction: column;
+  font-family: var(--font);
+  color: var(--text);
+  /* Fallback when there is no video: sky, snow and pine forest */
+  background: linear-gradient(180deg, #6f9cc2 0%, #b9cfe0 40%, #8c9c80 72%, #47553f 100%) fixed;
 }
+
+/* ---------- Background ---------- */
+
+.bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* Soft shade on the left and bottom so white text stays readable on snow */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(15, 25, 35, 0.38) 0%, rgba(15, 25, 35, 0.12) 55%, rgba(15, 25, 35, 0.05) 100%),
+    linear-gradient(0deg, rgba(15, 25, 35, 0.25) 0%, transparent 40%);
+}
+
+/* ---------- Shared glass surface ---------- */
+
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight);
+}
+
+/* ---------- Layout ---------- */
 
 .layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 32px;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
   align-items: center;
-  max-width: 1100px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 40px 32px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+    padding: 24px 16px;
   }
 }
 
+/* ---------- Left column ---------- */
+
 .title {
-  font-size: 3rem;
-  margin: 0 0 8px;
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+  text-shadow: var(--text-shadow);
 }
 
 .status-line {
-  color: var(--muted);
-  font-size: 1.2rem;
-  margin: 0 0 20px;
+  display: inline-block;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  margin: 0 0 26px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+  text-shadow: var(--text-shadow);
 }
 
-/* Toggle (work mode switch) */
+/* Work-mode toggle: a pill with a big glass knob that slides */
 .work-toggle {
-  display: inline-flex;
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 16px 6px 6px;
-  border: 1px solid var(--border);
+  width: 250px;
+  height: 64px;
+  margin: 10px 0 30px;
+  padding: 0 24px 0 100px;
   border-radius: 999px;
-  background: var(--card);
+  background: rgba(142, 197, 255, 0.3);
+  color: var(--text);
   font: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-shadow: var(--text-shadow);
   cursor: pointer;
-  margin-bottom: 20px;
+  transition: background 0.4s, padding 0.4s;
 }
 
+.work-toggle[aria-checked="true"] {
+  background: rgba(255, 181, 71, 0.42);
+  padding: 0 100px 0 28px;
+}
+
+/* The knob's outer edge lines up with the edge of the track, so the toggle
+   aligns with the bars below in both states. */
 .work-toggle-knob {
-  width: 26px;
-  height: 26px;
+  position: absolute;
+  top: 50%;
+  left: -1px;
+  width: 84px;
+  height: 84px;
+  margin-top: -42px;
   border-radius: 50%;
-  background: var(--border);
+  display: grid;
+  place-items: center;
+  background: var(--glass-bg-strong);
+  transition: left 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
 .work-toggle[aria-checked="true"] .work-toggle-knob {
-  background: var(--accent);
+  left: calc(100% - 83px);
 }
 
-.work-toggle:disabled,
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.work-toggle-knob svg {
+  width: 38px;
+  height: 38px;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
-/* Session bar: block + description */
+.work-toggle-knob .icon-sun {
+  stroke: var(--warm);
+  fill: var(--warm);
+  display: none;
+}
+
+.work-toggle-knob .icon-moon {
+  stroke: #fff;
+}
+
+.work-toggle[aria-checked="true"] .icon-sun {
+  display: block;
+}
+
+.work-toggle[aria-checked="true"] .icon-moon {
+  display: none;
+}
+
+/* Session bar: block + description in one glass pill */
 .session-bar {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.session-bar select,
-.session-bar input,
-.note-input {
-  font: inherit;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-  color: var(--text);
+  align-items: center;
+  max-width: 640px;
+  height: 60px;
+  padding: 0 10px 0 22px;
+  margin-bottom: 22px;
+  border-radius: 999px;
 }
 
 .session-bar input {
   flex: 1;
   min-width: 0;
-}
-
-.controls {
-  display: flex;
-  gap: 12px;
-}
-
-.control-button,
-.note-button {
   font: inherit;
-  padding: 10px 20px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--card);
-  cursor: pointer;
+  font-size: 1.05rem;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  outline: none;
+  text-shadow: var(--text-shadow);
 }
 
-/* Stopwatch card */
-.timer-card {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  text-align: center;
+.session-bar input::placeholder {
+  color: var(--text-soft);
 }
 
-.timer-card[data-status="running"] {
-  border-color: var(--accent);
+.session-bar-divider {
+  width: 1px;
+  height: 28px;
+  margin: 0 16px;
+  background: var(--glass-border);
 }
 
-/* Paused: the card must make it obvious */
-.timer-card[data-status="paused"] {
-  border-color: var(--paused);
-  border-style: dashed;
+/* Locked during a session. We dim the colour instead of using opacity:
+   opacity inside blurred glass over a video makes the browser flicker. */
+.session-bar input:disabled {
+  color: var(--text-soft);
+  cursor: not-allowed;
 }
 
-.timer-card[data-status="paused"] .card-state {
-  color: var(--paused);
+/* ---------- Glass dropdown (glass-select.js) ---------- */
+
+.glass-select-trigger {
+  font: inherit;
+  font-size: 1.05rem;
   font-weight: 700;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  padding: 8px 28px 8px 0;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 16px;
 }
 
-.elapsed {
-  font-size: 2.6rem;
+.glass-select-trigger.is-placeholder {
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.glass-select-trigger:disabled {
+  color: var(--text-soft);
+}
+
+.glass-select-list {
+  position: fixed;
+  z-index: 100;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  max-height: 340px;
+  overflow-y: auto;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+}
+
+.glass-select-list li {
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.glass-select-list li.is-active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.glass-select-list li[aria-selected="true"] {
+  font-weight: 800;
+}
+
+.glass-select-list li[aria-selected="true"]::after {
+  content: "  ✓";
+  color: var(--warm);
+}
+
+/* Control buttons */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 54px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.control-button:hover:not(:disabled) {
+  background: var(--glass-bg-strong);
+}
+
+.control-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Play icon when idle/paused, pause icon when running */
+.icon-pause,
+body[data-status="running"] .icon-play {
+  display: none;
+}
+
+body[data-status="running"] .icon-pause {
+  display: block;
+}
+
+body[data-status="running"] #primary-button {
+  background: rgba(255, 181, 71, 0.32);
+}
+
+/* Disabled buttons: dimmed colours, not opacity (it flickers over the video). */
+button:disabled {
+  cursor: not-allowed;
+  color: rgba(255, 250, 242, 0.5);
+}
+
+.glass:disabled {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- Stopwatch card ---------- */
+
+.timer-card {
+  padding: 28px 28px 30px;
+  border-radius: 32px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.4s, border-color 0.4s;
+}
+
+.timer-card[data-status="paused"] {
+  background: rgba(142, 197, 255, 0.22);
+  border-color: var(--cool);
+}
+
+.clock {
+  width: 100%;
+  max-width: 250px;
+  display: block;
+  margin: 0 auto 8px;
+  overflow: visible;
+}
+
+.clock-case {
+  fill: rgba(255, 255, 255, 0.18);
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 3;
+}
+
+.clock-track,
+.clock-progress {
+  fill: none;
+  stroke-width: 4;
+}
+
+.clock-track {
+  stroke: rgba(255, 255, 255, 0.22);
+}
+
+.clock-progress {
+  stroke: var(--warm);
+  stroke-dasharray: 100;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.timer-card[data-status="paused"] .clock-progress {
+  stroke: var(--cool);
+}
+
+.clock-ticks line {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-linecap: round;
+}
+
+.clock-number {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.clock-elapsed {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
   font-variant-numeric: tabular-nums;
-  margin: 8px 0;
+}
+
+.subdial {
+  fill: rgba(255, 255, 255, 0.12);
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1;
+}
+
+.hour-hand {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.second-hand {
+  stroke: var(--warm);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.hand-cap {
+  fill: var(--warm);
+}
+
+.hand-cap-inner {
+  fill: #fff;
+}
+
+.timer-card[data-status="paused"] .second-hand {
+  stroke: var(--cool);
+}
+
+.timer-card[data-status="paused"] .hand-cap {
+  fill: var(--cool);
+}
+
+/* Pushers: clickable, and they sink when pressed */
+.pusher {
+  fill: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+
+.pusher.pressed {
+  transform: translateY(4px);
 }
 
 .card-block {
-  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 6px 0 6px;
+  text-shadow: var(--text-shadow);
 }
 
 .card-state {
-  color: var(--muted);
-  margin: 4px 0 16px;
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 3px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-shadow: var(--text-shadow);
+}
+
+.timer-card[data-status="running"] .card-state {
+  background: rgba(255, 181, 71, 0.35);
+}
+
+.timer-card[data-status="paused"] .card-state {
+  background: rgba(142, 197, 255, 0.45);
+  letter-spacing: 0.08em;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    background: rgba(142, 197, 255, 0.12);
+  }
+}
+
+.card-initial-note,
+.summary {
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  text-shadow: var(--text-shadow);
+  white-space: pre-line; /* keeps the line break between the two notes */
+}
+
+.card-initial-note:empty {
+  display: none;
 }
 
 .limit-message {
-  background: #fff4e5;
-  border-radius: 12px;
-  padding: 12px;
-  font-weight: 600;
+  margin: 4px 0 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 181, 71, 0.38);
+  border: 1px solid var(--alert);
+  font-weight: 700;
+  line-height: 1.45;
+  text-shadow: var(--text-shadow);
 }
 
-.summary {
-  color: var(--muted);
+/* Dark glass button, like "View Full Lyrics" in the reference */
+.note-button {
+  margin-top: 6px;
+  padding: 13px 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(40, 40, 40, 0.42);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.note-button:hover {
+  background: rgba(40, 40, 40, 0.55);
 }
 
 .note-input {
   width: 100%;
-  margin-top: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink);
+  font: inherit;
   resize: vertical;
 }
 
+/* ---------- Footer ---------- */
+
 .footer {
-  text-align: center;
-  padding: 12px;
-  font-size: 0.85rem;
-  color: var(--muted);
+  padding: 0 32px 20px;
 }
 
-#notion-status[data-connected="false"] {
-  color: #b3261e;
+.notion-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-shadow: var(--text-shadow);
+}
+
+.notion-status::before {
+  content: "●  ";
+  color: #9be29b;
+}
+
+.notion-status[data-connected="false"]::before {
+  color: #ff8a80;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
