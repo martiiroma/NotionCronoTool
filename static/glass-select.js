@@ -8,9 +8,12 @@
 //   const select = createGlassSelect(rootElement, { placeholder, label, onChange });
 //   select.setOptions(["A", "B"]);  select.value;  select.setDisabled(true);
 //
+// Option `container`: where the list lives. By default <body>; inside a modal
+// it must be the modal itself, or the list would stay hidden behind it.
+//
 // Keyboard: arrows move, Enter/Space choose, Esc closes.
 
-function createGlassSelect(root, { placeholder, label, onChange }) {
+function createGlassSelect(root, { placeholder, label, onChange, container = document.body }) {
   let options = [];
   let selectedValue = "";
   let activeIndex = -1;
@@ -30,7 +33,7 @@ function createGlassSelect(root, { placeholder, label, onChange }) {
   list.setAttribute("role", "listbox");
   list.setAttribute("aria-label", label);
   list.hidden = true;
-  document.body.append(list);
+  container.append(list);
 
   function updateTrigger() {
     trigger.textContent = selectedValue || placeholder;
@@ -71,9 +74,11 @@ function createGlassSelect(root, { placeholder, label, onChange }) {
       return;
     }
     // Place the list just below the box that contains the dropdown.
+    // Inside a modal, positions are measured from the modal's corner.
     const box = root.getBoundingClientRect();
-    list.style.left = `${box.left}px`;
-    list.style.top = `${box.bottom + 8}px`;
+    const origin = container === document.body ? { left: 0, top: 0 } : container.getBoundingClientRect();
+    list.style.left = `${box.left - origin.left}px`;
+    list.style.top = `${box.bottom - origin.top + 8}px`;
     list.style.minWidth = `${box.width}px`;
     list.hidden = false;
     trigger.setAttribute("aria-expanded", "true");
@@ -112,7 +117,10 @@ function createGlassSelect(root, { placeholder, label, onChange }) {
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       choose(activeIndex);
-    } else if (event.key === "Escape" || event.key === "Tab") {
+    } else if (event.key === "Escape") {
+      event.preventDefault(); // inside a modal, Esc closes only the list
+      close();
+    } else if (event.key === "Tab") {
       close();
     }
   }

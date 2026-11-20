@@ -24,6 +24,11 @@
   box-sizing: border-box;
 }
 
+/* "hidden" must always win, even over rules that set a display value */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -504,8 +509,7 @@ textarea:focus-visible {
   }
 }
 
-.card-initial-note,
-.summary {
+.card-initial-note {
   color: var(--text-soft);
   font-size: 1rem;
   line-height: 1.5;
@@ -560,10 +564,206 @@ textarea:focus-visible {
   resize: vertical;
 }
 
+/* Pending: finished, waiting to be sent to Notion */
+.timer-card[data-status="pending"] {
+  border-color: var(--alert);
+}
+
+.timer-card[data-status="pending"] .card-state {
+  background: rgba(255, 214, 160, 0.42);
+}
+
+.review-button {
+  display: block;
+  width: 100%; /* as wide as the note box above */
+  margin: 14px 0 0;
+  background: rgba(255, 181, 71, 0.5);
+}
+
+.review-button:hover {
+  background: rgba(255, 181, 71, 0.65);
+}
+
+/* ---------- End-of-session modal ---------- */
+
+.end-modal {
+  width: min(480px, calc(100% - 32px));
+  padding: 28px 28px 24px;
+  border-radius: 32px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.22);
+  overflow: visible; /* lets the feeling list open below its box */
+  text-align: left;
+}
+
+.end-modal::backdrop {
+  background: rgba(10, 20, 30, 0.45);
+}
+
+.modal-title {
+  margin: 0 0 16px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-shadow: var(--text-shadow);
+}
+
+.modal-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  margin: 0 0 20px;
+}
+
+.modal-summary dt {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  text-shadow: var(--text-shadow);
+}
+
+.modal-summary dd {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-shadow: var(--text-shadow);
+}
+
+.modal-label {
+  display: block;
+  margin: 0 0 8px;
+  font-weight: 700;
+  text-shadow: var(--text-shadow);
+}
+
+.modal-label small {
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.modal-select {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 20px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+}
+
+/* The whole box opens the dropdown, not only the text */
+.modal-select .glass-select-trigger {
+  flex: 1;
+  align-self: stretch;
+  text-align: left;
+}
+
+/* Inside the modal the list blurs the modal itself: darker glass reads better */
+.end-modal .glass-select-list {
+  background: rgba(20, 30, 40, 0.72);
+}
+
+.end-modal .note-input {
+  margin-top: 0;
+}
+
+.modal-message {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+  text-shadow: var(--text-shadow);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.modal-message[data-kind="error"] {
+  background: rgba(179, 38, 30, 0.45);
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-button {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+
+.modal-button:hover:not(:disabled) {
+  background: var(--glass-bg-strong);
+}
+
+.modal-button-primary {
+  background: rgba(255, 181, 71, 0.5);
+}
+
+.modal-button-primary:hover:not(:disabled) {
+  background: rgba(255, 181, 71, 0.65);
+}
+
+.modal-button-danger {
+  background: rgba(179, 38, 30, 0.45);
+}
+
+.modal-link {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+
+.modal-confirm p {
+  margin: 20px 0 0;
+  font-weight: 600;
+  text-shadow: var(--text-shadow);
+}
+
+/* ---------- Confirmation message (toast) ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: var(--text-shadow);
+  background: rgba(20, 30, 40, 0.6);
+  z-index: 50;
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   padding: 0 32px 20px;
+}
+
+.queue-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-shadow: var(--text-shadow);
+  background: rgba(255, 181, 71, 0.4);
 }
 
 .notion-status {

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NotionCronoTool</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -97,19 +98,60 @@
       <p id="card-initial-note" class="card-initial-note"></p>
 
       <p id="limit-message" class="limit-message" hidden></p>
-      <p id="summary" class="summary" hidden></p>
 
-      <button id="note-button" class="note-button" type="button">Afegeix a la nota</button>
-      <textarea id="extra-note-input" class="note-input" rows="3" maxlength="2000"
-                placeholder="Afegeix-hi el que vulguis…" hidden></textarea>
+      <button id="note-button" class="note-button" type="button" hidden>Afegeix a la nota</button>
+      <textarea id="extra-note-input" class="note-input" rows="3" maxlength="4000"
+                placeholder="Afegeix-hi el que vulguis…" aria-label="Nota" hidden></textarea>
+      <button id="review-button" class="note-button review-button" type="button" hidden>Revisa i envia</button>
     </aside>
   </main>
 
   <footer class="footer">
     <span id="notion-status" class="notion-status glass">Comprovant la connexió amb Notion…</span>
+    <span id="queue-status" class="queue-status glass" hidden></span>
   </footer>
 
+  <!-- Short confirmation message after sending or discarding -->
+  <div id="toast" class="toast glass" role="status" hidden></div>
+
+  <!-- End-of-session modal: review, then send, keep pending or discard -->
+  <dialog id="end-modal" class="end-modal glass" aria-labelledby="end-modal-title">
+    <p id="modal-limit-message" class="limit-message" hidden></p>
+    <h2 id="end-modal-title" class="modal-title">Sessió acabada</h2>
+
+    <dl class="modal-summary">
+      <div><dt>Bloc</dt><dd id="modal-block"></dd></div>
+      <div><dt>Temps de treball</dt><dd id="modal-duration"></dd></div>
+      <div><dt>Franja</dt><dd id="modal-range"></dd></div>
+      <div><dt>Pausa</dt><dd id="modal-pause"></dd></div>
+    </dl>
+
+    <span class="modal-label">Com ha anat? <small>(opcional)</small></span>
+    <div id="feeling-select" class="glass-select modal-select glass"></div>
+
+    <label class="modal-label" for="modal-note">Nota</label>
+    <textarea id="modal-note" class="note-input" rows="4" maxlength="4000"
+              placeholder="Sense nota"></textarea>
+
+    <p id="modal-message" class="modal-message" role="status" hidden></p>
+
+    <div id="modal-actions" class="modal-actions">
+      <button id="modal-send" class="modal-button modal-button-primary glass" type="button">Envia a Notion</button>
+      <button id="modal-cancel" class="modal-button glass" type="button">Cancel·la</button>
+      <button id="modal-discard" class="modal-link" type="button">Descarta la sessió</button>
+    </div>
+
+    <div id="modal-confirm" class="modal-confirm" hidden>
+      <p>Segur que vols descartar aquesta sessió? No s'enviarà res a Notion.</p>
+      <div class="modal-actions">
+        <button id="modal-confirm-yes" class="modal-button modal-button-danger glass" type="button">Sí, descarta-la</button>
+        <button id="modal-confirm-no" class="modal-button glass" type="button">No</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="{{ url_for('static', filename='glass-select.js') }}"></script>
+  <script src="{{ url_for('static', filename='end-modal.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

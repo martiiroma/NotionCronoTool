@@ -22,6 +22,17 @@ python app.py
 
 Obre <http://localhost:5000> al navegador.
 
+## Com funciona una sessió
+
+1. Tria un bloc, escriu una nota inicial si vols i prem **Inicia**.
+2. Pausa i reprèn tantes vegades com calgui. Amb **Afegeix a la nota** pots completar la nota.
+3. Prem **Atura**: s'obre un resum amb la sensació (opcional) i la nota, que pots retocar.
+4. **Envia a Notion** crea la fila a ⏱ Sessions. **Cancel·la** la deixa pendent (botó «Revisa i envia»). **Descarta** la llença.
+
+**No es perd res:** la sessió es desa al navegador, així que pots recarregar o tancar la pestanya i en tornar continua on era (fes servir sempre el mateix navegador). Si Notion no respon en enviar, la sessió es guarda a `data/queue.json` i s'envia sola quan Notion torna.
+
+L'eina comprova en arrencar que ⏱ Sessions té les propietats i les opcions esperades. Si no, no hi escriu res i ho avisa al peu de la pàgina.
+
 ## Personalitzar
 
 Tots els ajustos són a `config/plan.toml` (títol, blocs, límit de temps, missatge). Els canvis s'apliquen en recarregar la pàgina.

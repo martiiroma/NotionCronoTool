@@ -3,18 +3,21 @@
 Serves the stopwatch page and small JSON endpoints that the page calls.
 """
 
-import os
-
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
-from notion_api import NotionError, get_data_source_name
+from notion_api import NotionError
 from plan_config import get_ui_config
+from session_sender import check_sessions, count_queued, flush_queue, send_session, validate_session
 
 # Load NOTION_TOKEN and the data source IDs from the .env file.
 load_dotenv()
 
 app = Flask(__name__)
+
+
+def get_blocks() -> list[str]:
+    return get_ui_config()["blocks"]
 
 
 @app.route("/")
@@ -31,12 +34,36 @@ def config():
 
 @app.route("/api/status")
 def notion_status():
-    """Tell the page whether the connection to ⏱ Sessions works."""
+    """Tell the page whether ⏱ Sessions is reachable and has the expected structure."""
+    queued = count_queued()
     try:
-        name = get_data_source_name(os.getenv("NOTION_SESSIONS_DS_ID"))
-        return jsonify(connected=True, message=f"Connectat a {name}")
+        name, problems = check_sessions(get_blocks())
     except NotionError as error:
-        return jsonify(connected=False, message=f"No connectat: {error}")
+        return jsonify(connected=False, message=f"No connectat: {error}", queued=queued)
+    if problems:
+        message = f"{name}: no s'hi enviarà res fins que ho arreglis a Notion: " + "; ".join(problems) + "."
+        return jsonify(connected=False, message=message, queued=queued)
+    return jsonify(connected=True, message=f"Connectat a {name}", queued=queued)
+
+
+@app.post("/api/sessions")
+def create_session():
+    """Receive a finished session from the page and send it to Notion."""
+    try:
+        session = validate_session(request.get_json(silent=True), get_blocks())
+    except ValueError as error:
+        return jsonify(ok=False, message=str(error)), 400
+    try:
+        result = send_session(session, get_blocks())
+    except NotionError as error:
+        return jsonify(ok=False, message=str(error)), 502
+    return jsonify(ok=True, result=result, queued=count_queued())
+
+
+@app.post("/api/queue/flush")
+def retry_queue():
+    """Try again to send the sessions that are waiting in the local queue."""
+    return jsonify(queued=flush_queue(get_blocks()))
 
 
 if __name__ == "__main__":
