@@ -9,8 +9,12 @@
 const FEELINGS = ["Peatge", "Neutre", "Plaer"];
 const QUEUE_RETRY_MS = 2 * 60 * 1000; // try the local queue again every 2 minutes
 
+const TASKS_PLACEHOLDER = "Cap tasca (opcional)";
+
 let feelingSelect = null;
+let taskSelect = null;
 let modalBusy = false;
+let tasksRequestNumber = 0; // ignores old answers if the modal is reopened meanwhile
 
 // ---------- Opening and closing ----------
 
@@ -26,6 +30,18 @@ function setUpEndModal() {
     },
   });
   feelingSelect.setOptions(FEELINGS);
+
+  taskSelect = createGlassSelect(ui("task-select"), {
+    placeholder: TASKS_PLACEHOLDER,
+    label: "Tasca",
+    container: modal,
+    searchable: true,
+    onChange: (taskId) => {
+      pending.taskId = taskId;
+      pending.taskName = taskSelect.selectedLabel;
+      saveState();
+    },
+  });
 
   ui("modal-send").addEventListener("click", sendPendingSession);
   ui("modal-cancel").addEventListener("click", () => modal.close());
@@ -64,6 +80,60 @@ function openEndModal() {
   if (!ui("end-modal").open) {
     ui("end-modal").showModal();
   }
+  loadTasks();
+}
+
+// ---------- Tasks (read from ✅ Tasques every time the modal opens) ----------
+
+async function loadTasks() {
+  const requestNumber = ++tasksRequestNumber;
+  taskSelect.setDisabled(true);
+  taskSelect.setOptions(currentTaskOption());
+  taskSelect.setValue(pending.taskId || "");
+  taskSelect.setPlaceholder("Carregant tasques…");
+  try {
+    const response = await fetch("/api/tasks");
+    const result = await response.json();
+    if (requestNumber !== tasksRequestNumber || !pending) {
+      return;
+    }
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+    showTaskOptions(result.tasks);
+  } catch {
+    if (requestNumber !== tasksRequestNumber) {
+      return;
+    }
+    // The session can still be sent (or queued) with the task already chosen,
+    // or without it: if a task was chosen, offer "keep it" or "no task".
+    taskSelect.setPlaceholder("No s'han pogut carregar les tasques");
+    if (pending && pending.taskId) {
+      taskSelect.setOptions([{ value: "", label: "Sense tasca" }, ...currentTaskOption()]);
+      taskSelect.setValue(pending.taskId);
+      taskSelect.setDisabled(false);
+    }
+  }
+}
+
+function showTaskOptions(tasks) {
+  const options = [{ value: "", label: "Sense tasca" }];
+  for (const task of tasks) {
+    options.push({ value: task.id, label: task.name });
+  }
+  // A task chosen earlier that is now finished stays available, so it is not lost.
+  if (pending.taskId && !tasks.some((task) => task.id === pending.taskId)) {
+    options.push(...currentTaskOption());
+  }
+  taskSelect.setOptions(options);
+  taskSelect.setPlaceholder(TASKS_PLACEHOLDER);
+  taskSelect.setValue(pending.taskId || "");
+  taskSelect.setDisabled(false);
+}
+
+// The task already chosen for this session, as a list of 0 or 1 options.
+function currentTaskOption() {
+  return pending.taskId ? [{ value: pending.taskId, label: pending.taskName }] : [];
 }
 
 // The note can be edited both here and below the clock; keep both in sync.
@@ -133,6 +203,7 @@ function buildSessionPayload(finished) {
     pauseMinutes: finished.pauseMinutes,
     note: finished.note,
     feeling: finished.feeling,
+    taskId: finished.taskId || "",
   };
 }
 

@@ -257,25 +257,55 @@ body {
 .glass-select-list {
   position: fixed;
   z-index: 100;
-  margin: 0;
   padding: 8px;
-  list-style: none;
-  max-height: 340px;
-  overflow-y: auto;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.2);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
   backdrop-filter: blur(28px) saturate(160%);
 }
 
+.glass-select-options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto; /* the height is set by glass-select.js to fit the window */
+}
+
 .glass-select-list li {
   padding: 10px 16px;
   border-radius: 14px;
   font-weight: 600;
+  line-height: 1.35;
   color: var(--text);
   text-shadow: var(--text-shadow);
   cursor: pointer;
-  white-space: nowrap;
+}
+
+.glass-select-list li.is-empty {
+  color: var(--text-soft);
+  font-weight: 500;
+  cursor: default;
+}
+
+/* Search box at the top of the list (task selector) */
+.glass-select-search {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+.glass-select-search::placeholder {
+  color: var(--text-soft);
+}
+
+.glass-select-search:focus {
+  border-color: #fff;
 }
 
 .glass-select-list li.is-active {
@@ -651,8 +681,11 @@ textarea:focus-visible {
 /* The whole box opens the dropdown, not only the text */
 .modal-select .glass-select-trigger {
   flex: 1;
+  min-width: 0;
   align-self: stretch;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis; /* long task names end in "…" */
 }
 
 /* Inside the modal the list blurs the modal itself: darker glass reads better */

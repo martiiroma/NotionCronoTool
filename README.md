@@ -26,7 +26,7 @@ Obre <http://localhost:5000> al navegador.
 
 1. Tria un bloc, escriu una nota inicial si vols i prem **Inicia**.
 2. Pausa i reprèn tantes vegades com calgui. Amb **Afegeix a la nota** pots completar la nota.
-3. Prem **Atura**: s'obre un resum amb la sensació (opcional) i la nota, que pots retocar.
+3. Prem **Atura**: s'obre un resum on pots triar la sensació i la tasca de ✅ Tasques (opcionals, amb cerca per nom) i retocar la nota.
 4. **Envia a Notion** crea la fila a ⏱ Sessions. **Cancel·la** la deixa pendent (botó «Revisa i envia»). **Descarta** la llença.
 
 **No es perd res:** la sessió es desa al navegador, així que pots recarregar o tancar la pestanya i en tornar continua on era (fes servir sempre el mateix navegador). Si Notion no respon en enviar, la sessió es guarda a `data/queue.json` i s'envia sola quan Notion torna.

@@ -238,6 +238,8 @@ function stopSession(reachedLimit) {
     reachedLimit: reachedLimit,
     note: buildFinalNote(session.initialNote, ui("extra-note-input").value),
     feeling: "",
+    taskId: "",   // optional task of ✅ Tasques (chosen in the modal)
+    taskName: "",
   };
 
   session.status = "pending";

@@ -78,7 +78,7 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 
 ### HU6 — Vincular una tasca
 *Com a estudiant, vull vincular, si cal, la sessió a una tasca de Notion.*
-- [ ] Un selector opcional amb cerca per nom mostra les tasques de ✅ Tasques que no estan en estat Fet, Done ni Arxivat.
+- [ ] Al modal de final de sessió, un selector opcional amb cerca per nom (sense distingir majúscules ni accents) mostra les tasques de ✅ Tasques que no estan en estat Fet, Done ni Arxivat, ordenades alfabèticament. L'opció «Sense tasca» desfà la tria.
 - [ ] Triar una tasca és opcional: puc iniciar la sessió sense tasca.
 - [ ] Si en trio una, l'eina l'assigna sola a la relació `Tasca` de la fila, sense que hagi d'anar a Notion.
 
@@ -171,3 +171,10 @@ Conté el missatge del límit de 3 h, els grups (PM, Dades), els terres i les ho
 | 6 | Selectors de vidre fets a mida | Selector natiu del navegador | El natiu no es pot fer de vidre; el component es reaprofita per a sensació (fase 2) i tasques amb cerca (fase 3) |
 
 **Impacte en el pressupost:** el selector a mida i el modal allarguen el projecte uns 45–60 min respecte a la previsió inicial. Acceptat el 20/11/2026.
+
+### v1.2 — fase 3 (tasques)
+
+| # | Canvi | Abans | Motiu |
+|---|---|---|---|
+| 7 | El selector de tasca és **al modal** de final de sessió | La v1.0 no en fixava el lloc | En acabar ja saps en què has treballat de veritat; un sol lloc nou i la pantalla principal neta |
+| 8 | Les tasques acabades es filtren **a l'eina**, no amb un filtre de Notion | — | Un filtre de Notion sobre un estat que no existís donaria error; filtrant a l'eina, no passa res |

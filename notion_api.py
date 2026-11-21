@@ -7,6 +7,7 @@ it never changes databases or properties.
 """
 
 import os
+import unicodedata
 from datetime import datetime
 
 import httpx
@@ -17,6 +18,7 @@ from notion_client import (
     RequestTimeoutError,
     RetryOptions,
     UnknownHTTPResponseError,
+    collect_paginated_api,
 )
 
 # Notion API version that the notion-client library (3.1.0) is built for.
@@ -39,9 +41,18 @@ SESSION_PROPERTIES = {
     "Sensació": "select",
     "Nota": "rich_text",
     "Origen": "select",
+    "Tasca": "relation",
 }
 FEELINGS = ["Peatge", "Neutre", "Plaer"]
 TOOL_ORIGIN = "Eina"
+
+# Properties of ✅ Tasques that the tool reads (it never writes there).
+TASK_PROPERTIES = {
+    "Nom": "title",
+    "Estat": "status",
+}
+# Tasks in these states are finished and are not offered in the selector.
+HIDDEN_TASK_STATUSES = {"Fet", "Done", "Arxivat"}
 
 # Errors where trying again later makes sense.
 TEMPORARY_ERROR_CODES = {
@@ -133,16 +144,22 @@ def find_schema_problems(data_source: dict, blocks: list[str]) -> list[str]:
     does not exist, and the tool must never change the database.
     """
     properties = data_source["properties"]
+    problems = _property_problems(properties, SESSION_PROPERTIES)
+    problems += _missing_options(properties, "Bloc", blocks)
+    problems += _missing_options(properties, "Sensació", FEELINGS)
+    problems += _missing_options(properties, "Origen", [TOOL_ORIGIN])
+    return problems
+
+
+def _property_problems(properties: dict, expected: dict) -> list[str]:
+    """Check that each expected property exists and has the right type."""
     problems = []
-    for name, expected_type in SESSION_PROPERTIES.items():
+    for name, expected_type in expected.items():
         prop = properties.get(name)
         if prop is None:
             problems.append(f"falta la propietat «{name}»")
         elif prop["type"] != expected_type:
             problems.append(f"la propietat «{name}» no és del tipus esperat")
-    problems += _missing_options(properties, "Bloc", blocks)
-    problems += _missing_options(properties, "Sensació", FEELINGS)
-    problems += _missing_options(properties, "Origen", [TOOL_ORIGIN])
     return problems
 
 
@@ -152,6 +169,46 @@ def _missing_options(properties: dict, name: str, wanted: list[str]) -> list[str
         return []
     existing = {option["name"] for option in prop["select"]["options"]}
     return [f"l'opció «{option}» no existeix a «{name}»" for option in wanted if option not in existing]
+
+
+# ---------- Reading the tasks (read-only) ----------
+
+
+def list_open_tasks(data_source_id: str | None) -> list[dict]:
+    """Return the tasks of ✅ Tasques that are not finished, sorted by name.
+
+    Each task is {"id": ..., "name": ...}. We filter here in Python instead of
+    asking Notion to filter: a Notion filter on a state that does not exist
+    would fail, while this way it simply has no effect.
+    """
+    data_source = get_data_source(data_source_id)
+    problems = _property_problems(data_source["properties"], TASK_PROPERTIES)
+    if problems:
+        raise NotionError("✅ Tasques no té l'estructura esperada: " + "; ".join(problems) + ".")
+
+    # Notion gives at most 100 rows per call: collect_paginated_api asks for all pages.
+    rows = _call_notion(
+        lambda notion: collect_paginated_api(
+            notion.data_sources.query, data_source_id=data_source_id, page_size=100
+        )
+    )
+    tasks = [_task_from_row(row) for row in rows if row.get("object") == "page"]
+    open_tasks = [task for task in tasks if task["status"] not in HIDDEN_TASK_STATUSES]
+    open_tasks.sort(key=lambda task: _sort_key(task["name"]))
+    return [{"id": task["id"], "name": task["name"]} for task in open_tasks]
+
+
+def _task_from_row(row: dict) -> dict:
+    properties = row["properties"]
+    name = "".join(piece["plain_text"] for piece in properties["Nom"]["title"]).strip()
+    status = (properties["Estat"].get("status") or {}).get("name", "")
+    return {"id": row["id"], "name": name or "(sense nom)", "status": status}
+
+
+def _sort_key(text: str) -> str:
+    """Alphabetical order that ignores accents and capitals («Àlgebra» next to «Algorisme»)."""
+    decomposed = unicodedata.normalize("NFD", text)
+    return "".join(char for char in decomposed if not unicodedata.combining(char)).casefold()
 
 
 # ---------- Creating a session row ----------
@@ -188,6 +245,9 @@ def build_session_properties(session: dict) -> dict:
         properties["Nota"] = {"rich_text": _text(session["note"])}
     if session["feeling"]:
         properties["Sensació"] = {"select": {"name": session["feeling"]}}
+    # .get(): sessions queued before phase 3 have no taskId.
+    if session.get("taskId"):
+        properties["Tasca"] = {"relation": [{"id": session["taskId"]}]}
     return properties
 
 

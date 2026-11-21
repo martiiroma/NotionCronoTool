@@ -3,10 +3,12 @@
 Serves the stopwatch page and small JSON endpoints that the page calls.
 """
 
+import os
+
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 
-from notion_api import NotionError
+from notion_api import NotionError, list_open_tasks
 from plan_config import get_ui_config
 from session_sender import check_sessions, count_queued, flush_queue, send_session, validate_session
 
@@ -44,6 +46,15 @@ def notion_status():
         message = f"{name}: no s'hi enviarà res fins que ho arreglis a Notion: " + "; ".join(problems) + "."
         return jsonify(connected=False, message=message, queued=queued)
     return jsonify(connected=True, message=f"Connectat a {name}", queued=queued)
+
+
+@app.route("/api/tasks")
+def tasks():
+    """List the open tasks of ✅ Tasques, for the task selector."""
+    try:
+        return jsonify(ok=True, tasks=list_open_tasks(os.getenv("NOTION_TASKS_DS_ID")))
+    except NotionError as error:
+        return jsonify(ok=False, message=str(error)), 502
 
 
 @app.post("/api/sessions")

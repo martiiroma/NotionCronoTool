@@ -6,6 +6,7 @@ again later (the page asks for it every few minutes and when it opens).
 
 import json
 import os
+import re
 import threading
 from pathlib import Path
 
@@ -21,6 +22,9 @@ from notion_api import (
 
 QUEUE_PATH = Path(__file__).parent / "data" / "queue.json"
 MAX_NOTE_LENGTH = 5000
+
+# A Notion id: 32 hexadecimal characters, with or without dashes.
+NOTION_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{8}-?([0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$")
 
 # The server can handle two requests at once; this stops two of them
 # from sending the queue at the same time (which would create duplicates).
@@ -52,6 +56,10 @@ def validate_session(payload, blocks: list[str]) -> dict:
     if feeling and feeling not in FEELINGS:
         raise ValueError("La sensació no és vàlida.")
 
+    task_id = payload.get("taskId") or ""
+    if task_id and not (isinstance(task_id, str) and NOTION_ID_PATTERN.match(task_id)):
+        raise ValueError("La tasca no és vàlida.")
+
     note = str(payload.get("note") or "").strip()[:MAX_NOTE_LENGTH]
     return {
         "id": str(payload.get("id") or ""),
@@ -61,6 +69,7 @@ def validate_session(payload, blocks: list[str]) -> dict:
         "pauseMinutes": round(pause_minutes),
         "note": note,
         "feeling": feeling,
+        "taskId": task_id,
     }
 
 
