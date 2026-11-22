@@ -16,6 +16,7 @@ from notion_api import (
     NotionUnavailableError,
     create_session_page,
     find_schema_problems,
+    get_block_options,
     get_data_source,
     get_data_source_name,
 )
@@ -34,13 +35,17 @@ _queue_lock = threading.Lock()
 # ---------- Checking what the page sends ----------
 
 
-def validate_session(payload, blocks: list[str]) -> dict:
-    """Check the data sent by the page. Raises ValueError with a Catalan message."""
+def validate_session(payload) -> dict:
+    """Check the data sent by the page. Raises ValueError with a Catalan message.
+
+    The block is checked against Notion's options later, just before writing
+    (Notion may be down right now, and then the session goes to the queue).
+    """
     if not isinstance(payload, dict):
         raise ValueError("Les dades de la sessió no són correctes.")
 
     block = payload.get("block")
-    if block not in blocks:
+    if not isinstance(block, str) or not block.strip() or len(block) > 100:
         raise ValueError("El bloc de la sessió no és vàlid.")
 
     started_at = payload.get("startedAt")
@@ -80,26 +85,37 @@ def _is_number(value) -> bool:
 # ---------- Sending ----------
 
 
-def check_sessions(blocks: list[str]) -> tuple[str, list[str]]:
-    """Read ⏱ Sessions and return (its name, list of structure problems)."""
+def check_sessions(blocks_needed: list[str]) -> tuple[str, list[str], list[str]]:
+    """Read ⏱ Sessions. Returns (its name, structure problems, the "Bloc" options).
+
+    blocks_needed: blocks that must exist as options (e.g. the one about to be sent).
+    """
     data_source = get_data_source(os.getenv("NOTION_SESSIONS_DS_ID"))
-    return get_data_source_name(data_source), find_schema_problems(data_source, blocks)
+    return (
+        get_data_source_name(data_source),
+        find_schema_problems(data_source, blocks_needed),
+        get_block_options(data_source),
+    )
 
 
-def _ensure_schema_matches(blocks: list[str]) -> None:
-    """Refuse to write if ⏱ Sessions is not as expected."""
-    _, problems = check_sessions(blocks)
+def _ensure_schema_matches(blocks_needed: list[str]) -> None:
+    """Refuse to write if ⏱ Sessions is not as expected.
+
+    This includes a block that does not exist in Notion: Notion would create
+    it silently, and the tool must never change the database.
+    """
+    _, problems, _ = check_sessions(blocks_needed)
     if problems:
         raise NotionError("⏱ Sessions no té l'estructura esperada: " + "; ".join(problems) + ".")
 
 
-def send_session(session: dict, blocks: list[str]) -> str:
+def send_session(session: dict) -> str:
     """Send a session to Notion. Returns "sent", or "queued" if Notion is down.
 
     Raises NotionError for problems that waiting will not fix (token, structure...).
     """
     try:
-        _ensure_schema_matches(blocks)
+        _ensure_schema_matches([session["block"]])
         create_session_page(os.getenv("NOTION_SESSIONS_DS_ID"), session)
         return "sent"
     except NotionUnavailableError:
@@ -107,14 +123,14 @@ def send_session(session: dict, blocks: list[str]) -> str:
         return "queued"
 
 
-def flush_queue(blocks: list[str]) -> int:
+def flush_queue() -> int:
     """Try to send the queued sessions. Returns how many are still waiting."""
     with _queue_lock:
         queue = _load_queue()
         if not queue:
             return 0
         try:
-            _ensure_schema_matches(blocks)
+            _ensure_schema_matches(sorted({session["block"] for session in queue}))
         except NotionError:
             return len(queue)  # Notion is down or not ready: keep everything
 

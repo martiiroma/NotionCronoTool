@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body data-status="idle">
+<body data-status="idle" data-view="home">
   <!-- Background: looping video (if configured) over a mountain gradient -->
   <video id="bg-video" class="bg-video" muted loop playsinline hidden></video>
   <div class="scrim" aria-hidden="true"></div>
@@ -18,7 +18,68 @@
   <main class="layout">
     <!-- Left column: title, status, toggle, session bar and controls -->
     <section class="hero">
+      <!-- Main tabs: Home (stopwatch) and Week (planned vs actual) -->
+      <nav class="view-tabs" role="tablist" aria-label="Vistes">
+        <button id="tab-home" class="view-tab glass" type="button" role="tab"
+                aria-selected="true" aria-controls="home-left" title="Inici">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3l-1 7-3 3h12l-3-3-1-7M12 13v8"/></svg>
+          <span class="visually-hidden">Inici</span>
+        </button>
+        <button id="tab-week" class="view-tab glass" type="button" role="tab"
+                aria-selected="false" aria-controls="week-left" title="Setmana">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+          <span class="visually-hidden">Setmana</span>
+        </button>
+      </nav>
+
       <h1 id="title" class="title">NotionCronoTool</h1>
+
+      <!-- Week view, left column: navigation and table per block -->
+      <div id="week-left" class="week-left" role="tabpanel" aria-labelledby="tab-week" hidden>
+        <div class="week-nav">
+          <button id="week-prev" class="week-nav-button glass" type="button" aria-label="Setmana anterior">‹</button>
+          <div class="week-heading">
+            <p id="week-range" class="week-range">—</p>
+            <p id="week-type" class="week-type"></p>
+          </div>
+          <button id="week-next" class="week-nav-button glass" type="button" aria-label="Setmana següent">›</button>
+          <span class="tip" data-tip="Torna a la setmana actual. S'activa quan mires una altra setmana.">
+            <button id="week-today" class="week-today glass" type="button"
+                    aria-describedby="week-today-tip">Avui</button>
+            <span id="week-today-tip" class="visually-hidden">Torna a la setmana actual. S'activa quan mires una altra setmana.</span>
+          </span>
+        </div>
+        <!-- Three sibling layers (none inside another blur, so the header blur works):
+             1. the glass background, 2. the rows that scroll, 3. the floating header. -->
+        <div class="week-table-wrap">
+          <div class="week-table-glass glass" aria-hidden="true"></div>
+
+          <div class="week-table-scroll" tabindex="0" aria-label="Hores de la setmana per bloc">
+            <p id="week-message" class="week-message" role="status" hidden></p>
+            <table class="week-table">
+              <colgroup><col><col class="col-number"><col class="col-number"><col class="col-number"></colgroup>
+              <!-- Real header for screen readers; the visible one is the floating copy below -->
+              <thead class="screen-reader-head">
+                <tr><th scope="col">Bloc</th><th scope="col">Previst</th><th scope="col">Real</th><th scope="col">Dif.</th></tr>
+              </thead>
+              <tbody id="week-table-body"></tbody>
+            </table>
+            <p id="week-incomplete" class="week-note"></p>
+          </div>
+
+          <div class="week-table-header" aria-hidden="true">
+            <table class="week-table">
+              <colgroup><col><col class="col-number"><col class="col-number"><col class="col-number"></colgroup>
+              <thead>
+                <tr><th>Bloc</th><th>Previst</th><th>Real</th><th>Dif.</th></tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home view, left column -->
+      <div id="home-left" class="home-left" role="tabpanel" aria-labelledby="tab-home">
       <p id="status-line" class="status-line">Tria un bloc per començar</p>
 
       <button id="work-toggle" class="work-toggle glass" type="button"
@@ -51,7 +112,50 @@
           <span>Atura</span>
         </button>
       </div>
+      </div>
     </section>
+
+    <!-- Week view, right column: the dial shows one group at a time -->
+    <aside id="week-card" class="timer-card week-card glass" hidden>
+      <svg id="week-dial" class="clock" viewBox="0 0 200 216" role="img" aria-labelledby="week-center-main">
+        <g class="pusher" aria-hidden="true">
+          <rect x="94" y="20" width="12" height="13" rx="2"/>
+          <rect x="85" y="7" width="30" height="15" rx="6"/>
+        </g>
+        <g transform="rotate(42 100 116)" aria-hidden="true">
+          <g class="pusher">
+            <rect x="96" y="22" width="8" height="11" rx="2"/>
+            <rect x="90" y="12" width="20" height="12" rx="5"/>
+          </g>
+        </g>
+        <circle class="clock-case" cx="100" cy="116" r="84"/>
+        <g id="week-segments"></g>
+        <text id="week-center-main" class="week-center-main" x="100" y="116">—</text>
+        <text id="week-center-sub" class="week-center-sub" x="100" y="132"></text>
+      </svg>
+      <div id="week-tooltip" class="week-tooltip" role="tooltip" hidden></div>
+
+      <div class="group-tabs" role="tablist" aria-label="Grups">
+        <button class="group-tab" type="button" role="tab" data-group="PM" aria-selected="true">PM</button>
+        <button class="group-tab" type="button" role="tab" data-group="Dades" aria-selected="false">Dades</button>
+        <button class="group-tab" type="button" role="tab" data-group="Altres" aria-selected="false">Altres</button>
+      </div>
+
+      <div class="dial-key" aria-hidden="true">
+        <span class="dial-key-item"><span class="dial-key-swatch is-planned"></span>Previst</span>
+        <span class="dial-key-item"><span class="dial-key-swatch is-actual"></span>Real</span>
+      </div>
+
+      <!-- Fixed-size area for the detail: scrolls inside if the text is long -->
+      <div class="week-detail">
+        <div id="week-legend" class="week-legend" hidden>
+          <p id="legend-block" class="legend-block"></p>
+          <p id="legend-hours" class="legend-hours"></p>
+          <p id="legend-feeling" class="legend-feeling"></p>
+        </div>
+        <p id="week-hint" class="week-hint">Clica una porció per veure'n el detall.</p>
+      </div>
+    </aside>
 
     <!-- Right column: the stopwatch card -->
     <aside id="timer-card" class="timer-card glass" data-status="idle">
@@ -116,6 +220,9 @@
 
   <!-- End-of-session modal: review, then send, keep pending or discard -->
   <dialog id="end-modal" class="end-modal glass" aria-labelledby="end-modal-title">
+    <!-- Inner box: scrolls if the content is taller than the window.
+         The dropdown lists live outside it, so they are never cut. -->
+    <div class="modal-body">
     <p id="modal-limit-message" class="limit-message" hidden></p>
     <h2 id="end-modal-title" class="modal-title">Sessió acabada</h2>
 
@@ -151,10 +258,12 @@
         <button id="modal-confirm-no" class="modal-button glass" type="button">No</button>
       </div>
     </div>
+    </div>
   </dialog>
 
   <script src="{{ url_for('static', filename='glass-select.js') }}"></script>
   <script src="{{ url_for('static', filename='end-modal.js') }}"></script>
+  <script src="{{ url_for('static', filename='week-view.js') }}"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

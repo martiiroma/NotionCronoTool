@@ -221,6 +221,7 @@ async function loadNotionStatus() {
     setText("notion-status", status.message);
     ui("notion-status").dataset.connected = String(status.connected);
     showQueueCount(status.queued);
+    updateBlockOptions(status.blocks);
   } catch {
     setText("notion-status", "No s'ha pogut comprovar la connexió amb Notion.");
     ui("notion-status").dataset.connected = "false";

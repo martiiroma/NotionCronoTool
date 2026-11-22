@@ -1,5 +1,10 @@
-# NotionCronoTool settings. You can edit this file at any time:
-# the changes apply when you reload the page (no need to restart the server).
+# NotionCronoTool settings - EXAMPLE.
+# Copy this file to config/plan.toml and put your own hours there.
+# config/plan.toml is personal and is not uploaded to the repository (.gitignore).
+#
+# You can edit plan.toml at any time: the changes apply when you reload the page.
+# The list of blocks comes from Notion (the options of the "Bloc" property).
+# Here you only set the planned hours and the groups.
 
 [app]
 # Big title on the main page.
@@ -14,18 +19,54 @@ limit_message = "Has fet cim: 3 hores! 🏔️ Ara toca baixar al refugi. Descan
 
 # Background video: file name inside static/media/ (e.g. "pirineu.mp4").
 # Leave it empty to use a plain gradient background.
-background_video = "cronotool-bg_video.mp4"
+background_video = ""
 
-# The 10 blocks. Names must match the "Bloc" options in Notion exactly.
+
+# ---------- Groups and weekly minimums (floors) ----------
+# Blocks that are in no group are shown under "Altres".
+
+[groups.PM]
+blocks = ["PM"]
+floor = 10
+
+[groups.Dades]
 blocks = [
-  "PM",
   "Python",
   "SQL i bases de dades",
   "Excel/Power BI online",
   "Exercici de comandes",
-  "Portafoli",
-  "Cerca de feina",
-  "Tancament setmanal",
-  "Formació presencial",
   "IT Academy",
+  "Formació presencial",
 ]
+floor = 8
+
+
+# ---------- Planned hours per week (example values) ----------
+# [weeks.default] is the "setmana tipus": used for every week not listed below.
+# Special weeks are named by their Monday (YYYY-MM-DD).
+# Block names must match the "Bloc" options in Notion exactly.
+
+[weeks.default]
+"PM" = 10
+"Python" = 4
+"SQL i bases de dades" = 3
+"Excel/Power BI online" = 2
+"Exercici de comandes" = 1
+"Formació presencial" = 0
+"Portafoli" = 2
+"Cerca de feina" = 1
+"Tancament setmanal" = 0.5
+"IT Academy" = 0
+
+# Example of a special week (e.g. a week with an in-person course).
+[weeks."2027-01-04"]
+"PM" = 8
+"Python" = 2
+"SQL i bases de dades" = 2
+"Excel/Power BI online" = 1
+"Exercici de comandes" = 1
+"Formació presencial" = 10
+"Portafoli" = 1
+"Cerca de feina" = 1
+"Tancament setmanal" = 1
+"IT Academy" = 0

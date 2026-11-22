@@ -163,12 +163,60 @@ def _property_problems(properties: dict, expected: dict) -> list[str]:
     return problems
 
 
+def get_block_options(data_source: dict) -> list[str]:
+    """The options of the "Bloc" property, in the order they have in Notion."""
+    prop = data_source["properties"].get("Bloc")
+    if prop is None or prop["type"] != "select":
+        return []
+    return [option["name"] for option in prop["select"]["options"]]
+
+
 def _missing_options(properties: dict, name: str, wanted: list[str]) -> list[str]:
     prop = properties.get(name)
     if prop is None or prop["type"] != "select":
         return []
     existing = {option["name"] for option in prop["select"]["options"]}
     return [f"l'opció «{option}» no existeix a «{name}»" for option in wanted if option not in existing]
+
+
+# ---------- Reading the sessions of a week (read-only) ----------
+
+
+def list_week_sessions(data_source_id: str | None, start: datetime, end: datetime) -> dict:
+    """Read the rows of ⏱ Sessions whose Franja starts between start and end.
+
+    Includes both "Manual" and "Eina" rows. Returns the block options (Notion
+    order) and, for each row, its block, its hours (the "Hores" formula, so
+    the totals match Notion) and its feeling.
+    """
+    data_source = get_data_source(data_source_id)
+    properties = data_source["properties"]
+    hours = properties.get("Hores")
+    if hours is None or hours["type"] != "formula":
+        raise NotionError("⏱ Sessions no té la fórmula «Hores» que la vista setmanal necessita.")
+
+    week_filter = {
+        "and": [
+            {"property": "Franja", "date": {"on_or_after": start.isoformat()}},
+            {"property": "Franja", "date": {"before": end.isoformat()}},
+        ]
+    }
+    rows = _call_notion(
+        lambda notion: collect_paginated_api(
+            notion.data_sources.query, data_source_id=data_source_id, filter=week_filter, page_size=100
+        )
+    )
+    sessions = [_session_from_row(row) for row in rows if row.get("object") == "page"]
+    return {"blocks": get_block_options(data_source), "sessions": sessions}
+
+
+def _session_from_row(row: dict) -> dict:
+    properties = row["properties"]
+    block = (properties.get("Bloc", {}).get("select") or {}).get("name")
+    feeling = (properties.get("Sensació", {}).get("select") or {}).get("name")
+    formula = properties.get("Hores", {}).get("formula") or {}
+    hours = formula.get("number") if formula.get("type") == "number" else None
+    return {"block": block, "hours": hours, "feeling": feeling}
 
 
 # ---------- Reading the tasks (read-only) ----------

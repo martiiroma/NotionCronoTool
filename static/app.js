@@ -13,6 +13,7 @@ const TICK_MS = 250;
 const CLOCK_CENTER = "100 116"; // centre of the main dial in the SVG
 const SUBDIAL_CENTER = "100 144"; // centre of the hours sub-dial
 const STORAGE_KEY = "notioncronotool.state";
+const BLOCKS_STORAGE_KEY = "notioncronotool.blocks";
 
 // Settings from config/plan.toml (filled in by loadConfig).
 const config = { title: "", blocks: [], limitMinutes: 180, limitMessage: "", backgroundVideo: "" };
@@ -521,7 +522,37 @@ async function loadConfig() {
   const response = await fetch("/api/config");
   Object.assign(config, await response.json());
   setText("title", config.title);
-  blockSelect.setOptions(config.blocks);
+  // Until Notion answers: the last list we saw, or the blocks of plan.toml.
+  blockSelect.setOptions(loadCachedBlocks() || config.fallbackBlocks);
+}
+
+// ---------- Blocks: the options of "Bloc" in Notion ----------
+// A new block added in Notion appears here by itself. The last list is kept
+// in the browser in case the page is opened without internet.
+
+function loadCachedBlocks() {
+  try {
+    const blocks = JSON.parse(localStorage.getItem(BLOCKS_STORAGE_KEY));
+    return Array.isArray(blocks) && blocks.length > 0 ? blocks : null;
+  } catch {
+    return null;
+  }
+}
+
+// Called by end-modal.js when the Notion status (with its blocks) arrives.
+function updateBlockOptions(blocks) {
+  if (!Array.isArray(blocks) || blocks.length === 0) {
+    return;
+  }
+  const current = blockSelect.value;
+  blockSelect.setOptions(blocks);
+  blockSelect.setValue(current);
+  try {
+    localStorage.setItem(BLOCKS_STORAGE_KEY, JSON.stringify(blocks));
+  } catch {
+    // Storage blocked: we simply don't keep a copy.
+  }
+  render();
 }
 
 function toggleExtraNote() {
@@ -559,6 +590,7 @@ async function init() {
     onChange: render,
   });
   setUpEndModal();
+  setUpWeekView();
   connectEvents();
   buildMinuteTicks();
   try {

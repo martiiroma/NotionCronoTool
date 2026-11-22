@@ -35,6 +35,12 @@ L'eina comprova en arrencar que ⏱ Sessions té les propietats i les opcions es
 
 ## Personalitzar
 
-Tots els ajustos són a `config/plan.toml` (títol, blocs, límit de temps, missatge). Els canvis s'apliquen en recarregar la pàgina.
+Els **blocs** surten de les opcions de la propietat `Bloc` de ⏱ Sessions a Notion: si n'hi afegeixes un, apareix sol al selector.
+
+La resta d'ajustos són a `config/plan.toml`: títol, límit de temps, missatge, **grups amb el mínim setmanal** (PM, Dades) i **hores previstes** per bloc (`[weeks.default]` per a la setmana tipus i `[weeks."AAAA-MM-DD"]`, amb la data del dilluns, per a les setmanes especials). Els canvis s'apliquen en recarregar la pàgina.
+
+## Vista setmanal
+
+La pestanya 📅 mostra, per a cada setmana, les hores previstes davant de les reals (la fórmula `Hores` de Notion, files Manual i Eina). L'esfera mostra un grup cada vegada; clica una porció per veure'n el detall i la sensació més habitual.
 
 **Vídeo de fons (opcional):** posa un vídeo `.mp4` a `static/media/` (per exemple, un de llicència lliure de [Pexels](https://www.pexels.com/)) i escriu-ne el nom a `background_video`. Millor en 1080p: el 4K pesa molt i fa treballar més l'ordinador. Els vídeos no es pugen al repositori. Sense vídeo, es mostra un degradat.

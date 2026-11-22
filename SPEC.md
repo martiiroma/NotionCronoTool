@@ -38,7 +38,7 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 
 ### HU1 — Iniciar una sessió
 *Com a estudiant, vull triar un bloc i prémer «Inicia» per registrar el temps sense haver-hi de pensar.*
-- [ ] Hi ha un selector amb els 10 blocs, amb els mateixos noms que a Notion: PM, Python, SQL i bases de dades, Excel/Power BI online, Exercici de comandes, Portafoli, Cerca de feina, Tancament setmanal, Formació presencial, IT Academy.
+- [ ] Hi ha un selector amb els blocs, que són les opcions de la propietat `Bloc` de Notion, en el mateix ordre (inicialment: PM, Python, SQL i bases de dades, Excel/Power BI online, Exercici de comandes, Portafoli, Cerca de feina, Tancament setmanal, Formació presencial, IT Academy). Un bloc nou afegit a Notion hi apareix sol.
 - [ ] Al costat del selector hi ha un camp opcional de **nota inicial** (per exemple, «Avui toca acabar el curs»), que es veu durant tota la sessió.
 - [ ] «Inicia» està desactivat fins que hi ha un bloc triat.
 - [ ] En iniciar, el cronòmetre mostra el temps actiu en format hh:mm:ss.
@@ -84,7 +84,9 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 
 ### HU7 — Previst davant de real
 *Com a estudiant, vull veure cada setmana si arribo a les hores previstes.*
-- [ ] Una vista mostra la setmana actual (de dilluns a diumenge) amb una fila per bloc: hores previstes, hores reals i diferència.
+- [ ] Dues pestanyes amb icona sobre el títol: 📌 Inici (cronòmetre) i 📅 Setmana.
+- [ ] La vista Setmana mostra la setmana actual (de dilluns a diumenge) amb una taula per bloc: hores previstes, hores reals (fórmula `Hores`) i diferència.
+- [ ] L'esfera del cronòmetre mostra un grup cada vegada (pestanyes PM · Dades · Altres): una porció per bloc, amb un arc pàl·lid (previst) i un d'intens (real). En passar-hi el ratolí surt el nom; en clicar-la, una llegenda amb previst, real, diferència i la sensació més habitual de la setmana (si n'empaten dues, totes dues).
 - [ ] Les hores reals inclouen totes les files de ⏱ Sessions de la setmana, tant `Manual` com `Eina`.
 - [ ] Les hores previstes surten de `config/plan.toml`, segons el tipus de setmana.
 - [ ] Hi ha dos totals amb el terra marcat: **PM** (terra 10 h) i **Dades** (terra 8 h). Dades = Python + SQL i bases de dades + Excel/Power BI online + Exercici de comandes + IT Academy + Formació presencial.
@@ -178,3 +180,14 @@ Conté el missatge del límit de 3 h, els grups (PM, Dades), els terres i les ho
 |---|---|---|---|
 | 7 | El selector de tasca és **al modal** de final de sessió | La v1.0 no en fixava el lloc | En acabar ja saps en què has treballat de veritat; un sol lloc nou i la pantalla principal neta |
 | 8 | Les tasques acabades es filtren **a l'eina**, no amb un filtre de Notion | — | Un filtre de Notion sobre un estat que no existís donaria error; filtrant a l'eina, no passa res |
+
+### v1.3 — fase 4 (previst davant de real)
+
+| # | Canvi | Abans | Motiu |
+|---|---|---|---|
+| 9 | Els blocs del selector surten de les opcions de `Bloc` a **Notion** | Llista fixa de 10 blocs a `plan.toml` | Un bloc nou a Notion apareix sol. L'eina continua sense crear mai opcions: abans d'escriure comprova que el bloc existeix |
+| 10 | Vista setmanal en una **pestanya** amb l'esfera del cronòmetre per grups, *tooltip* i llegenda al clic | Una vista amb una fila per bloc | Coherència amb la interfície i lectura d'un cop d'ull; la taula es manté com a vista detallada i accessible |
+| 11 | La llegenda mostra la **sensació més habitual** de cada bloc a la setmana | — | Afegeix el «com» al «quant» sense estadístiques avançades |
+| 12 | Les hores reals sumen la fórmula **`Hores`** de Notion | — | Els totals coincideixen exactament amb la vista «Per bloc» de Notion |
+
+**Impacte en el pressupost:** la vista per pestanyes i l'esfera interactiva afegeixen ~1 h a la fase 4. Acceptat el 21/11/2026.
