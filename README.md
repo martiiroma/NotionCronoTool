@@ -6,12 +6,15 @@ Eina personal per cronometrar hores d'estudi per blocs i desar-les a Notion.
 ## Instal·lació (PowerShell)
 
 ```powershell
-cd "D:\01_Projectes\Claude Projects\Claude Code Workspace\NotionCronoTool"
+cd "<carpeta on tens NotionCronoTool>"
 py -3.15 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-Copy-Item .env.example .env   # i omple els valors
+Copy-Item .env.example .env                          # i omple els valors
+Copy-Item config\plan.example.toml config\plan.toml  # i posa-hi les teves hores
 ```
+
+`config/plan.toml` és personal: no es puja al repositori.
 
 ## Arrencar
 

@@ -1,6 +1,9 @@
 # Secrets: never commit
 .env
 
+# Personal study plan (hours). The repository has config/plan.example.toml instead.
+config/plan.toml
+
 # Python virtual environment and caches
 .venv/
 __pycache__/
