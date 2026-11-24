@@ -1,6 +1,6 @@
 # SPEC — NotionCronoTool v1
 
-*Versió 1.1 · 20/11/2026 · Responsable: autor del repositori · Canvis respecte a la 1.0 a la secció 9*
+*Versió 1.4 (final de la v1) · 24/11/2026 · Responsable: autor del repositori · Canvis respecte a la 1.0 a la secció 9*
 
 ## 1. Problema i objectiu
 
@@ -38,64 +38,64 @@ Segueixo un pla d'estudi amb hores previstes per bloc (PM, Python, SQL...). Sens
 
 ### HU1 — Iniciar una sessió
 *Com a estudiant, vull triar un bloc i prémer «Inicia» per registrar el temps sense haver-hi de pensar.*
-- [ ] Hi ha un selector amb els blocs, que són les opcions de la propietat `Bloc` de Notion, en el mateix ordre (inicialment: PM, Python, SQL i bases de dades, Excel/Power BI online, Exercici de comandes, Portafoli, Cerca de feina, Tancament setmanal, Formació presencial, IT Academy). Un bloc nou afegit a Notion hi apareix sol.
-- [ ] Al costat del selector hi ha un camp opcional de **nota inicial** (per exemple, «Avui toca acabar el curs»), que es veu durant tota la sessió.
-- [ ] «Inicia» està desactivat fins que hi ha un bloc triat.
-- [ ] En iniciar, el cronòmetre mostra el temps actiu en format hh:mm:ss.
-- [ ] Durant la sessió, «Afegeix a la nota» permet escriure més text, que s'uneix a la nota inicial.
-- [ ] Només hi pot haver una sessió activa alhora.
+- [x] Hi ha un selector amb els blocs, que són les opcions de la propietat `Bloc` de Notion, en el mateix ordre (inicialment: PM, Python, SQL i bases de dades, Excel/Power BI online, Exercici de comandes, Portafoli, Cerca de feina, Tancament setmanal, Formació presencial, IT Academy). Un bloc nou afegit a Notion hi apareix sol.
+- [x] Al costat del selector hi ha un camp opcional de **nota inicial** (per exemple, «Avui toca acabar el curs»), que es veu durant tota la sessió.
+- [x] «Inicia» està desactivat fins que hi ha un bloc triat.
+- [x] En iniciar, el cronòmetre mostra el temps actiu en format hh:mm:ss.
+- [x] Durant la sessió, «Afegeix a la nota» permet escriure més text, que s'uneix a la nota inicial.
+- [x] Només hi pot haver una sessió activa alhora.
 
 ### HU2 — Pausar i reprendre
 *Com a estudiant, vull poder pausar el cronòmetre si m'interrompen, sense tancar la sessió.*
-- [ ] Amb una sessió activa, hi ha un botó «Pausa». En pausa, es converteix en «Reprèn».
-- [ ] En pausa, el cronòmetre s'atura i la pantalla ho indica clarament.
-- [ ] Hi pot haver diverses pauses dins la mateixa sessió.
-- [ ] En aturar, el total de minuts en pausa es desa a `Pausa (min)`.
+- [x] Amb una sessió activa, hi ha un botó «Pausa». En pausa, es converteix en «Reprèn».
+- [x] En pausa, el cronòmetre s'atura i la pantalla ho indica clarament.
+- [x] Hi pot haver diverses pauses dins la mateixa sessió.
+- [x] En aturar, el total de minuts en pausa es desa a `Pausa (min)`.
 
 ### HU3 — Aturar, revisar i enviar la sessió
 *Com a estudiant, vull aturar la sessió, revisar-ne el resum i enviar-la a Notion quan estigui a punt.*
-- [ ] En aturar, s'obre un modal amb el resum: bloc, temps actiu en hores i minuts (per exemple, «1 h 25 min») i nota final.
-- [ ] La nota final uneix la nota inicial i el text afegit durant la sessió. Si només n'hi ha un, és aquest.
-- [ ] El modal té un selector de **sensació** opcional (Peatge, Neutre, Plaer), amb el mateix component de vidre que el selector de blocs.
-- [ ] «Envia» crea la fila a ⏱ Sessions amb `Sessió` = «Bloc · dd/mm», `Bloc`, `Franja` (inici i final), `Pausa (min)`, `Nota`, `Sensació` i `Origen` = Eina.
-- [ ] «Cancel·la» torna a la pantalla principal: la sessió queda pendent, la nota es pot retocar i «Revisa i envia» torna a obrir el modal. No es pot iniciar una sessió nova fins que s'envia o es descarta.
-- [ ] «Descarta» (amb confirmació) elimina la sessió pendent sense enviar res.
-- [ ] Les `Hores` que calcula Notion coincideixen amb el temps actiu del cronòmetre (marge d'1 minut).
+- [x] En aturar, s'obre un modal amb el resum: bloc, temps actiu en hores i minuts (per exemple, «1 h 25 min») i nota final.
+- [x] La nota final uneix la nota inicial i el text afegit durant la sessió. Si només n'hi ha un, és aquest.
+- [x] El modal té un selector de **sensació** opcional (Peatge, Neutre, Plaer), amb el mateix component de vidre que el selector de blocs.
+- [x] «Envia» crea la fila a ⏱ Sessions amb `Sessió` = «Bloc · dd/mm», `Bloc`, `Franja` (inici i final), `Pausa (min)`, `Nota`, `Sensació` i `Origen` = Eina.
+- [x] «Cancel·la» torna a la pantalla principal: la sessió queda pendent, la nota es pot retocar i «Revisa i envia» torna a obrir el modal. No es pot iniciar una sessió nova fins que s'envia o es descarta.
+- [x] «Descarta» (amb confirmació) elimina la sessió pendent sense enviar res.
+- [x] Les `Hores` que calcula Notion coincideixen amb el temps actiu del cronòmetre (marge d'1 minut).
 
 ### HU4 — Límit de 3 hores
 *Com a estudiant, vull que la sessió s'aturi sola a les 3 h, per si me n'oblido i per recordar-me que he de descansar.*
-- [ ] Quan el temps actiu arriba a 3:00:00, la sessió s'atura i es desa sola, com a HU3.
-- [ ] El temps en pausa no compta per al límit.
-- [ ] Apareix un missatge visible amb to amè, que m'anima a descansar i continuar més tard o l'endemà. El text és provisional i es pot canviar a `config/plan.toml`.
-- [ ] Si la pestanya no és visible, surt també una notificació del navegador (si he donat permís).
+- [x] Quan el temps actiu arriba a 3:00:00, la sessió s'atura i es desa sola, com a HU3.
+- [x] El temps en pausa no compta per al límit.
+- [x] Apareix un missatge visible amb to amè, que m'anima a descansar i continuar més tard o l'endemà. El text és provisional i es pot canviar a `config/plan.toml`.
+- [x] Si la pestanya no és visible, surt també una notificació del navegador (si he donat permís).
 
 ### HU5 — No perdre cap sessió
 *Com a estudiant, no vull perdre una sessió per haver tancat la pestanya o perquè Notion falli.*
-- [ ] Si tanco o recarrego la pestanya amb una sessió activa o en pausa, en tornar-la a obrir la sessió continua amb el temps correcte.
-- [ ] Si tanco o recarrego la pestanya amb una sessió pendent d'enviar, en tornar-la a obrir la sessió hi continua.
-- [ ] Si Notion no respon en enviar, la sessió es guarda en un fitxer local i es torna a enviar automàticament quan Notion respon.
-- [ ] Els errors es mostren en català i amb llenguatge clar (sense codis tècnics).
+- [x] Si tanco o recarrego la pestanya amb una sessió activa o en pausa, en tornar-la a obrir la sessió continua amb el temps correcte.
+- [x] Si tanco o recarrego la pestanya amb una sessió pendent d'enviar, en tornar-la a obrir la sessió hi continua.
+- [x] Si Notion no respon en enviar, la sessió es guarda en un fitxer local i es torna a enviar automàticament quan Notion respon.
+- [x] Els errors es mostren en català i amb llenguatge clar (sense codis tècnics).
 
 ### HU6 — Vincular una tasca
 *Com a estudiant, vull vincular, si cal, la sessió a una tasca de Notion.*
-- [ ] Al modal de final de sessió, un selector opcional amb cerca per nom (sense distingir majúscules ni accents) mostra les tasques de ✅ Tasques que no estan en estat Fet, Done ni Arxivat, ordenades alfabèticament. L'opció «Sense tasca» desfà la tria.
-- [ ] Triar una tasca és opcional: puc iniciar la sessió sense tasca.
-- [ ] Si en trio una, l'eina l'assigna sola a la relació `Tasca` de la fila, sense que hagi d'anar a Notion.
+- [x] Al modal de final de sessió, un selector opcional amb cerca per nom (sense distingir majúscules ni accents) mostra les tasques de ✅ Tasques que no estan en estat Fet, Done ni Arxivat, ordenades alfabèticament. L'opció «Sense tasca» desfà la tria.
+- [x] Triar una tasca és opcional: puc iniciar la sessió sense tasca.
+- [x] Si en trio una, l'eina l'assigna sola a la relació `Tasca` de la fila, sense que hagi d'anar a Notion.
 
 ### HU7 — Previst davant de real
 *Com a estudiant, vull veure cada setmana si arribo a les hores previstes.*
-- [ ] Dues pestanyes amb icona sobre el títol: 📌 Inici (cronòmetre) i 📅 Setmana.
-- [ ] La vista Setmana mostra la setmana actual (de dilluns a diumenge) amb una taula per bloc: hores previstes, hores reals (fórmula `Hores`) i diferència.
-- [ ] L'esfera del cronòmetre mostra un grup cada vegada (pestanyes PM · Dades · Altres): una porció per bloc, amb un arc pàl·lid (previst) i un d'intens (real). En passar-hi el ratolí surt el nom; en clicar-la, una llegenda amb previst, real, diferència i la sensació més habitual de la setmana (si n'empaten dues, totes dues).
-- [ ] Les hores reals inclouen totes les files de ⏱ Sessions de la setmana, tant `Manual` com `Eina`.
-- [ ] Les hores previstes surten de `config/plan.toml`, segons el tipus de setmana.
-- [ ] Hi ha dos totals amb el terra marcat: **PM** (terra 10 h) i **Dades** (terra 8 h). Dades = Python + SQL i bases de dades + Excel/Power BI online + Exercici de comandes + IT Academy + Formació presencial.
-- [ ] Puc anar a la setmana anterior i a la següent.
+- [x] Dues pestanyes amb icona sobre el títol: 📌 Inici (cronòmetre) i 📅 Setmana.
+- [x] La vista Setmana mostra la setmana actual (de dilluns a diumenge) amb una taula per bloc: hores previstes, hores reals (fórmula `Hores`) i diferència.
+- [x] L'esfera del cronòmetre mostra un grup cada vegada (pestanyes PM · Dades · Altres): una porció per bloc, amb un arc pàl·lid (previst) i un d'intens (real). En passar-hi el ratolí surt el nom; en clicar-la, una llegenda amb previst, real, diferència i la sensació més habitual de la setmana (si n'empaten dues, totes dues).
+- [x] Les hores reals inclouen totes les files de ⏱ Sessions de la setmana, tant `Manual` com `Eina`.
+- [x] Les hores previstes surten de `config/plan.toml`, segons el tipus de setmana.
+- [x] Hi ha dos totals amb el terra marcat: **PM** (terra 10 h) i **Dades** (terra 8 h). Dades = Python + SQL i bases de dades + Excel/Power BI online + Exercici de comandes + IT Academy + Formació presencial.
+- [x] Puc anar a la setmana anterior i a la següent.
 
 ### HU8 — Arrencar fàcil
 *Com a estudiant, vull obrir l'eina sense haver d'escriure ordres.*
-- [ ] Un doble clic a `start.bat` engega el servidor i obre la pàgina al navegador.
-- [ ] El `README.md` explica com instal·lar-la i fer-la servir, pensat per a algú que no programa.
+- [x] Un doble clic a `start.bat` engega el servidor i obre la pàgina al navegador.
+- [x] El `README.md` explica com instal·lar-la i fer-la servir, pensat per a algú que no programa.
 
 ## 5. Model de dades a Notion
 
@@ -191,3 +191,12 @@ Conté el missatge del límit de 3 h, els grups (PM, Dades), els terres i les ho
 | 12 | Les hores reals sumen la fórmula **`Hores`** de Notion | — | Els totals coincideixen exactament amb la vista «Per bloc» de Notion |
 
 **Impacte en el pressupost:** la vista per pestanyes i l'esfera interactiva afegeixen ~1 h a la fase 4. Acceptat el 21/11/2026.
+
+### v1.4 — fase 5 (tancament)
+
+| # | Canvi | Abans | Motiu |
+|---|---|---|---|
+| 13 | El pla d'hores personal (`config/plan.toml`) queda fora del repositori; es publica `config/plan.example.toml` | El pla real era al repositori | El repositori és públic. L'historial es va netejar abans de publicar-lo (sense noms ni hores reals) |
+| 14 | `start.bat` crida `launcher.py`: arrenca sense *debug*, obre el navegador quan el servidor respon i, si l'eina ja està en marxa, només obre el navegador | Un sol `start.bat` | Les comprovacions i les esperes són més clares i segures en Python |
+
+**Tancament de la v1:** totes les històries d'usuari (HU1–HU8) superen la seva prova manual. Resultat respecte als criteris d'èxit (§1): v1 operativa el 22/11/2026 ✅; registre de la setmana del 23/11 en curs ⏳; construcció en menys de 8 h davant de les ~6 h previstes ⚠️, per canvis d'abast acceptats i documentats en aquesta secció.

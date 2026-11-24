@@ -54,7 +54,9 @@ Si creus que alguna d'aquestes decisions no és bona, digues-m'ho i explica'm pe
 
 ## Ordres útils
 
-Totes per a **PowerShell**, des de la carpeta del projecte:
+- **Ús diari:** doble clic a `start.bat` (engega el servidor sense *debug* i obre el navegador; si ja està en marxa, només obre el navegador).
+
+Per programar, totes per a **PowerShell**, des de la carpeta del projecte:
 
 - Activar l'entorn virtual: `.\.venv\Scripts\Activate.ps1` (el prompt comença per `(.venv)`).
 - Instal·lar dependències: `pip install -r requirements.txt`
